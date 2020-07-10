@@ -19,4 +19,4 @@ build: clean ${SRC_EXE}
 
 .PHONY: clean
 clean:
-	- rm -f "$(SRC_DIR)/*.exe"
+	- rm -f $(SRC_DIR)/*.exe

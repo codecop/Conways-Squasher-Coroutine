@@ -24,7 +24,7 @@ out:    resd    1                       ; module global data for SQUASHER, WRITE
 
 ; --------------------------------------------------------------------------------
 SYS_READ equ    3
-STDIN   equ     2
+STDIN   equ     0
 
 RDCRD:
         mov     eax, [i]

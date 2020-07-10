@@ -41,6 +41,7 @@ RDCRD:
 	    mov     eax, SYS_READ           ; sys_read
 	    sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack
 	    int     0x80
+	    add     esp, 16
 
 .exit:
         ret
@@ -114,6 +115,7 @@ printEbx:
 	    mov     eax, SYS_WRITE          ; system call number for write
 	    sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack
 	    int     0x80                    ; make the actual system call
+	    add     esp, 16
 
         ret
 

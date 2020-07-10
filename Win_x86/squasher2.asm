@@ -79,14 +79,14 @@ SQUASHER_CORO:                          ; label 1
         inc     esi
         mov     [i], esi
 
-        ; mov     eax, [t1] ; still in here
+        mov     eax, [t1]               ; redundant, value still in register
         cmp     eax, '*'
         jne     .not_equal_ast
 
 .equal_ast:
         call    RDCRD
 
-        ; mov     esi, [i] ; still in here
+        mov     esi, [i]                ; redundant, value still in register
         xor     eax, eax
         mov     al, [card + esi]
         mov     [t2], eax
@@ -94,7 +94,7 @@ SQUASHER_CORO:                          ; label 1
         inc     esi
         mov     [i], esi
 
-        ; mov     eax, [t2] ; still in here
+        mov     eax, [t2]               ; redundant, value still in register
         cmp     eax, '*'
         jne     .not_equal_second_ast
 

@@ -22,15 +22,15 @@ card:   resb    card_len                ; module global data for RDCRD and SQUAS
 t1:     resd    1                       ; module global data for SQUASHER
 t2:     resd    1                       ; module global data for SQUASHER
 
-bytesRead: resd    1                    ; module local data for SQUASHER
+bytesRead: resd 1                       ; module local data for SQUASHER
 
 out:    resd    1                       ; module global data for SQUASHER, WRITE
 
         section .text
 
 ; --------------------------------------------------------------------------------
-SYS_READ    equ     3
-STDIN       equ     2
+SYS_READ equ    3
+STDIN   equ     2
 
 RDCRD:
         mov     eax, [i]
@@ -41,13 +41,13 @@ RDCRD:
 
         ; read card into card[1:80]
 
-	    push    dword card_len          ; message length
-	    push    dword card              ; message to write
-	    push    dword STDIN             ; file descriptor value
-	    mov     eax, SYS_READ           ; sys_read
-	    sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack
-	    int     0x80
-	    add     esp, 16
+        push    dword card_len          ; message length
+        push    dword card              ; message to write
+        push    dword STDIN             ; file descriptor
+        mov     eax, SYS_READ
+        sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack
+        int     0x80
+        add     esp, 16
 
 .exit:
         ret
@@ -111,18 +111,18 @@ SQUASHER_CORO:                          ; label 1
         jmp     SQUASHER_CORO
 
 ; --------------------------------------------------------------------------------
-SYS_WRITE equ 4
-STDOUT    equ 1
+SYS_WRITE equ   4
+STDOUT  equ     1
 
 printEbx:
         ; 1 character
-	    push    dword 1                 ; message length
-	    push    ebx                     ; message to write
-	    push    dword STDOUT            ; file descriptor value
-	    mov     eax, SYS_WRITE          ; system call number for write
-	    sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack
-	    int     0x80                    ; make the actual system call
-	    add     esp, 16
+        push    dword 1                 ; message length
+        push    ebx                     ; message to write
+        push    dword STDOUT            ; file descriptor
+        mov     eax, SYS_WRITE
+        sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack
+        int     0x80
+        add     esp, 16
 
         ret
 
@@ -150,12 +150,12 @@ WRITE_CORO:
         ret
 
 ; --------------------------------------------------------------------------------
-SYS_EXIT  equ 1
+SYS_EXIT equ    1
 
 _exitProgram:
-	    mov     eax, SYS_EXIT           ; sys_exit
-	    mov     ebx, 0                  ; return code = 0
-	    int     0x80
+        mov     eax, SYS_EXIT
+        mov     ebx, 0                  ; return code = 0
+        int     0x80
         hlt                             ; never here
 
 ; --------------------------------------------------------------------------------

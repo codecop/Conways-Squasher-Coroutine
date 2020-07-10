@@ -1,4 +1,4 @@
-bits 32                                 ; 32 bit architecture, implied by NASM -fwin32
+bits 32
         ; external functions in system libraries
         extern  _ExitProcess@4          ; https://msdn.microsoft.com/en-us/library/windows/desktop/ms682658%28v=vs.85%29.aspx
         extern  _GetStdHandle@4         ; https://msdn.microsoft.com/en-us/library/windows/desktop/ms683231%28v=vs.85%29.aspx
@@ -27,7 +27,7 @@ card:   resb    card_len                ; module global data for RDCRD and SQUAS
 t1:     resd    1                       ; module global data for SQUASHER
 t2:     resd    1                       ; module global data for SQUASHER
 
-bytesRead: resd    1                    ; module local data for SQUASHER
+bytesRead: resd 1                       ; module local data for SQUASHER
 
 out:    resd    1                       ; module global data for SQUASHER, WRITE
 

@@ -41,8 +41,8 @@ RDCRD:
 
         ; read card into card[1:80]
 
-        push    dword card_len          ; message length
-        push    dword card              ; message to write
+        push    dword card_len          ; maximum number of bytes to read
+        push    dword card              ; buffer to read into
         push    dword STDIN             ; file descriptor
         mov     eax, SYS_READ
         sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack

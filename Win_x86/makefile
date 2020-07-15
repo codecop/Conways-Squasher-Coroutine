@@ -12,6 +12,7 @@ $(SRC_DIR)/%.obj: $(SRC_DIR)/%.asm
 
 $(SRC_DIR)/%.exe: $(SRC_DIR)/%.obj
 	ld $< -o $@ -e _main -lkernel32 --enable-stdcall-fixup
-#   GoLink $< /fo $@ /console C:\Windows\SysWOW64\kernel32.dll
+#	GoLink $< /fo $@ /entry _main /console C:\Windows\SysWOW64\kernel32.dll
+#	gcc $< -o $@
 
 build: ${SRC_EXE}

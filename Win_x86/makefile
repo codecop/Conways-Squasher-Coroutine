@@ -13,7 +13,7 @@ $(SRC_DIR)/%.o: $(SRC_DIR)/%.asm
 	$(CC) $(FLAGS) $< -o $@
 
 $(SRC_DIR)/%.exe: $(SRC_DIR)/%.o
-	${LINK} -o $@ $< -e_main -lkernel32 --enable-stdcall-fixup C:\Windows\system32\kernel32.dll
+	${LINK} -o $@ $< -e_main -lkernel32 --enable-stdcall-fixup C:\Windows\SysWOW64\kernel32.dll
 
 build: clean ${SRC_EXE}
 

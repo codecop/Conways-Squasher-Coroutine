@@ -16,8 +16,6 @@ card:   resb    card_len                ; module global data for RDCRD and SQUAS
 t1:     resd    1                       ; module global data for SQUASHER
 t2:     resd    1                       ; module global data for SQUASHER
 
-numBytes: resd  1                       ; module local data for SQUASHER
-
 out:    resd    1                       ; module global data for SQUASHER, WRITE
 
         section .text

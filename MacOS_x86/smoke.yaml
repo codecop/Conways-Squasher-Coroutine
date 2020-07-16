@@ -1,0 +1,42 @@
+tests:
+  - name: "subroutine no asterisk"
+    command: ./squasher1.exe
+    stdin: "1234567890abcdefghijklmnopqrst1234567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij_"
+    stdout: "1234567890abcdefghijklmnopqrst1234567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij"
+    exit-status: 1
+  - name: "subroutine one asterisk"
+    command: ./squasher1.exe
+    stdin: "*234567890abcdefghijklmnopqrst*234567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij_"
+    stdout: "*234567890abcdefghijklmnopqrst*234567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij"
+    exit-status: 1
+  - name: "subroutine two asterisks"
+    command: ./squasher1.exe
+    stdin: "**34567890abcdefghijklmnopqrst**34567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij_"
+    stdout: "^34567890abcdefghijklmnopqrst^34567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij"
+    exit-status: 1
+  - name: "subroutine three asterisks"
+    command: ./squasher1.exe
+    stdin: "***4567890abcdefghijklmnopqrst***4567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij_"
+    stdout: "^*4567890abcdefghijklmnopqrst^*4567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij"
+    exit-status: 1
+
+  - name: "coroutine no asterisk"
+    command: ./squasher2.exe
+    stdin: "1234567890abcdefghijklmnopqrst1234567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij_"
+    stdout: "1234567890abcdefghijklmnopqrst1234567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij"
+    exit-status: 1
+  - name: "coroutine one asterisk"
+    command: ./squasher2.exe
+    stdin: "*234567890abcdefghijklmnopqrst*234567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij_"
+    stdout: "*234567890abcdefghijklmnopqrst*234567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij"
+    exit-status: 1
+  - name: "coroutine two asterisks"
+    command: ./squasher2.exe
+    stdin: "**34567890abcdefghijklmnopqrst**34567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij_"
+    stdout: "^34567890abcdefghijklmnopqrst^34567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij"
+    exit-status: 1
+  - name: "coroutine three asterisks"
+    command: ./squasher2.exe
+    stdin: "***4567890abcdefghijklmnopqrst***4567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij_"
+    stdout: "^*4567890abcdefghijklmnopqrst^*4567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij"
+    exit-status: 1

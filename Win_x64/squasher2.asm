@@ -8,9 +8,9 @@ card_len equ    80
         section .bss
 
 %macro coro 2
-        mov rbx, %%_cnt
-        mov [route_%1], rbx
-        jmp %2
+        mov     rbx, %%_cnt
+        mov     [route_%1], rbx
+        jmp     %2
 %%_cnt: nop
 %endmacro
 

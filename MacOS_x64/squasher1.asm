@@ -11,15 +11,15 @@ switch: resd    1                       ; module global data for SQUASHER
 %define ON      dword 1
 %define OFF     dword 0
 
-i:      resd    1                       ; module global data for RDCRD and SQUASHER
-card:   resb    card_len                ; module global data for RDCRD and SQUASHER
+i:      resq    1                       ; module global data for RDCRD and SQUASHER
+card:   resq    card_len                ; module global data for RDCRD and SQUASHER
 
-t1:     resd    1                       ; module global data for SQUASHER
-t2:     resd    1                       ; module global data for SQUASHER
+t1:     resq    1                       ; module global data for SQUASHER
+t2:     resq    1                       ; module global data for SQUASHER
 
-bytesRead: resd 1                       ; module local data for SQUASHER
+bytesRead: resq 1                       ; module local data for SQUASHER
 
-out:    resd    1                       ; module global data for SQUASHER, WRITE
+out:    resq    1                       ; module global data for SQUASHER, WRITE
 
         section .text
 
@@ -59,8 +59,7 @@ SQUASHER:
 .off:
         call    RDCRD
 
-		xor     rsi, rsi
-        mov     esi, [i]
+        mov     rsi, [i]
         xor     rax, rax
         mov     rdi, card
         mov     al, [rdi + rsi]
@@ -76,10 +75,9 @@ SQUASHER:
 .equal_ast:
         call    RDCRD
 
-		xor     rsi, rsi
-        mov     esi, [i]                ; redundant, value still in register
+        mov     rsi, [i]                ; redundant, value still in register
         xor     rax, rax
-        mov     rdi, [card]
+        mov     rdi, card
         mov     al, [rdi + rsi]
         mov     [t2], rax
 
@@ -155,14 +153,7 @@ _main:
         ; set up global data
         mov     [i], dword card_len
 
-        call    RDCRD
-        call    SQUASHER
-        mov     rbx, card
-        call    printRbx
-        mov     rbx, t1
-        call    printRbx
-        mov     rbx, debug
-        call    printRbx
+        call    WRITE
 
 .finished:
         jmp     _exitProgram

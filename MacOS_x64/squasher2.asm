@@ -1,53 +1,51 @@
-bits 32
+bits 64
+default rel
 
-%define NULL    dword 0
+%define NULL    qword 0
 
 card_len equ    80
 
         section .bss
 
 %macro coro 2
-        lea ebx, [%%_cnt]
-        mov [route_%1], ebx
+        lea rbx, [%%_cnt]
+        mov [route_%1], rbx
         jmp %2
 %%_cnt: nop
 %endmacro
 
-route_SQUASHER: resd 1                  ; storage of IP, module global data for SQUASHER
-route_WRITE:    resd 1                  ; storage of IP, module global data for WRITE
+route_SQUASHER: resq 1                  ; storage of IP, module global data for SQUASHER
+route_WRITE:    resq 1                  ; storage of IP, module global data for WRITE
 
-i:      resd    1                       ; module global data for RDCRD and SQUASHER
-card:   resb    card_len                ; module global data for RDCRD and SQUASHER
+i:      resq    1                       ; module global data for RDCRD and SQUASHER
+card:   resq    card_len                ; module global data for RDCRD and SQUASHER
 
-t1:     resd    1                       ; module global data for SQUASHER
-t2:     resd    1                       ; module global data for SQUASHER
+t1:     resq    1                       ; module global data for SQUASHER
+t2:     resq    1                       ; module global data for SQUASHER
 
-bytesRead: resd 1                       ; module local data for SQUASHER
+bytesRead: resq 1                       ; module local data for SQUASHER
 
-out:    resd    1                       ; module global data for SQUASHER, WRITE
+out:    resq    1                       ; module global data for SQUASHER, WRITE
 
         section .text
 
 ; --------------------------------------------------------------------------------
-SYS_READ equ    3
+SYS_READ equ    0x2000003
 STDIN   equ     0
 
 RDCRD:
-        mov     eax, [i]
-        cmp     eax, card_len
+        mov     rax, [i]
+        cmp     rax, card_len
         jne     .exit
 
-        mov     [i], dword 0
+        mov     qword [i], 0
 
         ; read card into card[1:80]
-
-        push    dword card_len          ; maximum number of bytes to read
-        push    dword card              ; buffer to read into
-        push    dword STDIN             ; file descriptor
-        mov     eax, SYS_READ
-        sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack
-        int     0x80
-        add     esp, 16
+		mov     rdx, card_len           ; maximum number of bytes to read
+		mov     rsi, card               ; buffer to read into
+		mov     rdi, STDIN              ; file descriptor
+        mov     rax, SYS_READ
+        syscall
 
 .exit:
         ret
@@ -61,68 +59,68 @@ SQUASHER:
 SQUASHER_CORO:                          ; label 1
         call    RDCRD
 
-        mov     esi, [i]
-        xor     eax, eax
-        mov     al, [card + esi]
-        mov     [t1], eax
+        mov     rsi, [i]
+        xor     rax, rax
+        mov     rdi, card
+        mov     al, [rdi + rsi]
+        mov     [t1], rax
 
-        inc     esi
-        mov     [i], esi
+        inc     rsi
+        mov     [i], rsi
 
-        mov     eax, [t1]               ; redundant, value still in register
-        cmp     eax, '*'
+        mov     rax, [t1]               ; redundant, value still in register
+        cmp     rax, '*'
         jne     .not_equal_ast
 
 .equal_ast:
         call    RDCRD
 
-        mov     esi, [i]                ; redundant, value still in register
-        xor     eax, eax
-        mov     al, [card + esi]
-        mov     [t2], eax
+        mov     rsi, [i]                ; redundant, value still in register
+        xor     rax, rax
+        mov     rdi, card
+        mov     al, [rdi + rsi]
+        mov     [t2], rax
 
-        inc     esi
-        mov     [i], esi
+        inc     rsi
+        mov     [i], rsi
 
-        mov     eax, [t2]               ; redundant, value still in register
-        cmp     eax, '*'
+        mov     rax, [t2]               ; redundant, value still in register
+        cmp     rax, '*'
         jne     .not_equal_second_ast
 
 .equal_second_ast:
-        mov     [t1], dword '^'
+        mov     qword [t1], '^'
         jmp     .not_equal_ast
 
 .not_equal_second_ast:
-        mov     eax, [t1]
-        mov     [out], eax
+        mov     rax, [t1]
+        mov     [out], rax
         coro    SQUASHER, WRITE
 
-        mov     eax, [t2]
-        mov     [out], eax
+        mov     rax, [t2]
+        mov     [out], rax
         coro    SQUASHER, WRITE
 
         jmp     SQUASHER_CORO
 
 .not_equal_ast:                         ; label 2
-        mov     eax, [t1]
-        mov     [out], eax
+        mov     rax, [t1]
+        mov     [out], rax
         coro    SQUASHER, WRITE
 
         jmp     SQUASHER_CORO
 
 ; --------------------------------------------------------------------------------
-SYS_WRITE equ   4
+SYS_WRITE equ   0x2000004
 STDOUT  equ     1
 
-printEbx:
+printRbx:
         ; 1 character
-        push    dword 1                 ; message length
-        push    ebx                     ; message to write
-        push    dword STDOUT            ; file descriptor
-        mov     eax, SYS_WRITE
-        sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack
-        int     0x80
-        add     esp, 16
+        mov     rdx, 1                  ; message length
+        mov     rsi, rbx                ; message to write
+        mov     rdi, STDOUT             ; file descriptor
+        mov     rax, SYS_WRITE
+        syscall
 
         ret
 
@@ -140,37 +138,36 @@ WRITE_CORO:
         ; so it can only return a single read element. The look ahead
         ; reads a second element and thus needs a switch to return the
         ; looked "ahead" element on next call.
-        lea     ebx, [out]
-        call    printEbx
+        lea     rbx, [out]
+        call    printRbx
 
-        mov     eax, [i]
-        cmp     eax, card_len
+        mov     rax, [i]
+        cmp     rax, card_len
         jne     .loop
 
         ret
 
 ; --------------------------------------------------------------------------------
-SYS_EXIT equ    1
+SYS_EXIT equ    0x2000001
 
 _exitProgram:
-        mov     eax, SYS_EXIT
-        mov     ebx, 0                  ; return code = 0
-        int     0x80
-        hlt                             ; never here
+        mov     rax, SYS_EXIT
+        mov     rdi, 0                  ; return code = 0
+        syscall
 
 ; --------------------------------------------------------------------------------
         global  _main
 
 _main:
         ; set up coroutine routers
-        lea     ebx, [SQUASHER_CORO]
-        mov     [route_SQUASHER], ebx
+        lea     rbx, [SQUASHER_CORO]
+        mov     [route_SQUASHER], rbx
 
-        lea     ebx, [WRITE_CORO]
-        mov     [route_WRITE], ebx
+        lea     rbx, [WRITE_CORO]
+        mov     [route_WRITE], rbx
 
         ; set up global data
-        mov     [i], dword card_len
+        mov     qword [i], card_len
 
         call    WRITE
 

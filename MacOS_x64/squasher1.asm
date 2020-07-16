@@ -24,7 +24,7 @@ out:    resd    1                       ; module global data for SQUASHER, WRITE
         section .text
 
 ; --------------------------------------------------------------------------------
-SYS_READ equ    3
+SYS_READ equ    0x2000003
 STDIN   equ     0
 
 RDCRD:
@@ -104,7 +104,7 @@ SQUASHER:
         ret
 
 ; --------------------------------------------------------------------------------
-SYS_WRITE equ   4
+SYS_WRITE equ   0x2000004
 STDOUT  equ     1
 
 printRbx:
@@ -136,7 +136,7 @@ WRITE:
         ret
 
 ; --------------------------------------------------------------------------------
-SYS_EXIT equ    1
+SYS_EXIT equ    0x2000001
 
 _exitProgram:
         mov     rax, SYS_EXIT

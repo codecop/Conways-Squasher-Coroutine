@@ -13,6 +13,6 @@ $(SRC_DIR)/%.obj: $(SRC_DIR)/%.asm
 $(SRC_DIR)/%.exe: $(SRC_DIR)/%.obj
 	ld $< -o $@ -e _main -LC:\Windows\system32 -lkernel32
 #	GoLink $< /fo $@ /entry _main /console C:\Windows\system32\kernel32.dll
-#	gcc $< -o $@ -LC:\Windows\system32 -lkernel32
+#	gcc $< -o $@
 
 build: ${SRC_EXE}

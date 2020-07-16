@@ -59,7 +59,8 @@ SQUASHER:
 .off:
         call    RDCRD
 
-        mov     rsi, [i]
+		xor     rsi, rsi
+        mov     esi, [i]
         xor     rax, rax
         mov     rdi, card
         mov     al, [rdi + rsi]
@@ -75,7 +76,8 @@ SQUASHER:
 .equal_ast:
         call    RDCRD
 
-        mov     rsi, [i]                ; redundant, value still in register
+		xor     rsi, rsi
+        mov     esi, [i]                ; redundant, value still in register
         xor     rax, rax
         mov     rdi, [card]
         mov     al, [rdi + rsi]
@@ -153,7 +155,17 @@ _main:
         ; set up global data
         mov     [i], dword card_len
 
-        call    WRITE
+        call    RDCRD
+        call    SQUASHER
+        mov     rbx, card
+        call    printRbx
+        mov     rbx, t1
+        call    printRbx
+        mov     rbx, debug
+        call    printRbx
 
 .finished:
         jmp     _exitProgram
+
+debug:
+	db 'x'

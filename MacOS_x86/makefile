@@ -14,3 +14,7 @@ $(SRC_DIR)/%: $(SRC_DIR)/%.o
 #	gcc $< -o $@
 
 build: ${SRC_EXE}
+
+.PHONY: test
+test: ${SRC_EXE}
+	~/smoke-v2.1.0-Darwin-x86_64 ${SRC_DIR}

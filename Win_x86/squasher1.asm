@@ -122,11 +122,12 @@ printEbx:
         call    _GetStdHandle@4
 
         ; 1 character
-        push    NULL
-        push    NULL
-        push    dword 1
-        push    ebx
-        push    eax
+        push    NULL            ; LPOVERLAPPED lpOverlapped
+        mov     ecx, bytesRead
+        push    ecx             ; LPDWORD      lpNumberOfBytesWritten,
+        push    dword 1         ; DWORD        nNumberOfBytesToWrite,
+        push    ebx             ; LPCVOID      lpBuffer,
+        push    eax             ; HANDLE       hFile,
         call    _WriteFile@20
 
         ret

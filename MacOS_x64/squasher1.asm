@@ -1,15 +1,15 @@
 bits 64
 default rel
 
-%define NULL    dword 0
+%define NULL    qword 0
 
 card_len equ    80
 
         section .bss
 
-switch: resd    1                       ; module global data for SQUASHER
-%define ON      dword 1
-%define OFF     dword 0
+switch: resq    1                       ; module global data for SQUASHER
+%define ON      qword 1
+%define OFF     qword 0
 
 i:      resq    1                       ; module global data for RDCRD and SQUASHER
 card:   resq    card_len                ; module global data for RDCRD and SQUASHER
@@ -32,7 +32,7 @@ RDCRD:
         cmp     rax, card_len
         jne     .exit
 
-        mov     [i], dword 0
+        mov     qword [i], 0
 
         ; read card into card[1:80]
 		mov     rdx, card_len           ; maximum number of bytes to read
@@ -46,14 +46,14 @@ RDCRD:
 
 ; --------------------------------------------------------------------------------
 SQUASHER:
-        mov     eax, [switch]
-        cmp     eax, OFF
+        mov     rax, [switch]
+        cmp     rax, OFF
         je      .off
 .on:
         mov     rax, [t2]
         mov     [out], rax
 
-        mov     [switch], OFF
+        mov     qword [switch], OFF
         jmp     .exit
 
 .off:
@@ -89,11 +89,11 @@ SQUASHER:
         jne     .not_equal_second_ast
 
 .equal_second_ast:
-        mov     [t1], dword '^'
+        mov     qword [t1], '^'
         jmp     .not_equal_ast
 
 .not_equal_second_ast:
-        mov     [switch], ON
+        mov     qword [switch], ON
         jmp     .not_equal_ast
 
 .not_equal_ast:                         ; label 1
@@ -148,10 +148,10 @@ _exitProgram:
 
 _main:
         ; set up switch
-        mov     [switch], OFF
+        mov     qword [switch], OFF
 
         ; set up global data
-        mov     [i], dword card_len
+        mov     qword [i], card_len
 
         call    WRITE
 

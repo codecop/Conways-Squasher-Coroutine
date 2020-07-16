@@ -11,7 +11,7 @@ $(SRC_DIR)/%.obj: $(SRC_DIR)/%.asm
 	nasm -fwin64 -w+all $< -o $@
 
 $(SRC_DIR)/%.exe: $(SRC_DIR)/%.obj
-	ld $< -o $@ -e _main -LC:\Windows\system32 -lkernel32
+	ld $< -o $@ -e _main -L "$(LIBRARY_PATH)" -lkernel32
 #	GoLink $< /fo $@ /entry _main /console C:\Windows\system32\kernel32.dll
 #	gcc $< -o $@
 

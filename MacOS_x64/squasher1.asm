@@ -1,23 +1,19 @@
 bits 64
 default rel
 
-%define NULL    qword 0
-
 card_len equ    80
 
         section .bss
 
 switch: resq    1                       ; module global data for SQUASHER
-%define ON      qword 1
-%define OFF     qword 0
+ON      equ     1
+OFF     equ     0
 
 i:      resq    1                       ; module global data for RDCRD and SQUASHER
-card:   resq    card_len                ; module global data for RDCRD and SQUASHER
+card:   resb    card_len                ; module global data for RDCRD and SQUASHER
 
 t1:     resq    1                       ; module global data for SQUASHER
 t2:     resq    1                       ; module global data for SQUASHER
-
-bytesRead: resq 1                       ; module local data for SQUASHER
 
 out:    resq    1                       ; module global data for SQUASHER, WRITE
 
@@ -35,9 +31,10 @@ RDCRD:
         mov     qword [i], 0
 
         ; read card into card[1:80]
-		mov     rdx, card_len           ; maximum number of bytes to read
-		mov     rsi, card               ; buffer to read into
-		mov     rdi, STDIN              ; file descriptor
+
+        mov     rdx, card_len           ; maximum number of bytes to read
+        mov     rsi, card               ; buffer to read into
+        mov     rdi, STDIN              ; file descriptor
         mov     rax, SYS_READ
         syscall
 
@@ -60,8 +57,8 @@ SQUASHER:
         call    RDCRD
 
         mov     rsi, [i]
-        xor     rax, rax
         mov     rdi, card
+        xor     rax, rax
         mov     al, [rdi + rsi]
         mov     [t1], rax
 
@@ -76,8 +73,8 @@ SQUASHER:
         call    RDCRD
 
         mov     rsi, [i]                ; redundant, value still in register
-        xor     rax, rax
         mov     rdi, card
+        xor     rax, rax
         mov     al, [rdi + rsi]
         mov     [t2], rax
 
@@ -108,7 +105,6 @@ SYS_WRITE equ   0x2000004
 STDOUT  equ     1
 
 printRbx:
-        ; 1 character
         mov     rdx, 1                  ; message length
         mov     rsi, rbx                ; message to write
         mov     rdi, STDOUT             ; file descriptor
@@ -126,7 +122,7 @@ WRITE:
         ; so it can only return a single read element. The look ahead
         ; reads a second element and thus needs a switch to return the
         ; looked "ahead" element on next call.
-        lea     rbx, [out]
+        mov     rbx, out
         call    printRbx
 
         mov     rax, [i]
@@ -157,6 +153,3 @@ _main:
 
 .finished:
         jmp     _exitProgram
-
-debug:
-	db 'x'

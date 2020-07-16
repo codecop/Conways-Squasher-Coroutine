@@ -1,16 +1,14 @@
 bits 64
 default rel
 
-%define NULL    qword 0
-
 card_len equ    80
 
         section .bss
 
 %macro coro 2
-        lea rbx, [%%_cnt]
-        mov [route_%1], rbx
-        jmp %2
+        mov     rbx, %%_cnt
+        mov     [route_%1], rbx
+        jmp     %2
 %%_cnt: nop
 %endmacro
 
@@ -18,12 +16,10 @@ route_SQUASHER: resq 1                  ; storage of IP, module global data for 
 route_WRITE:    resq 1                  ; storage of IP, module global data for WRITE
 
 i:      resq    1                       ; module global data for RDCRD and SQUASHER
-card:   resq    card_len                ; module global data for RDCRD and SQUASHER
+card:   resb    card_len                ; module global data for RDCRD and SQUASHER
 
 t1:     resq    1                       ; module global data for SQUASHER
 t2:     resq    1                       ; module global data for SQUASHER
-
-bytesRead: resq 1                       ; module local data for SQUASHER
 
 out:    resq    1                       ; module global data for SQUASHER, WRITE
 
@@ -41,9 +37,10 @@ RDCRD:
         mov     qword [i], 0
 
         ; read card into card[1:80]
-		mov     rdx, card_len           ; maximum number of bytes to read
-		mov     rsi, card               ; buffer to read into
-		mov     rdi, STDIN              ; file descriptor
+
+        mov     rdx, card_len           ; maximum number of bytes to read
+        mov     rsi, card               ; buffer to read into
+        mov     rdi, STDIN              ; file descriptor
         mov     rax, SYS_READ
         syscall
 
@@ -60,8 +57,8 @@ SQUASHER_CORO:                          ; label 1
         call    RDCRD
 
         mov     rsi, [i]
-        xor     rax, rax
         mov     rdi, card
+        xor     rax, rax
         mov     al, [rdi + rsi]
         mov     [t1], rax
 
@@ -76,8 +73,8 @@ SQUASHER_CORO:                          ; label 1
         call    RDCRD
 
         mov     rsi, [i]                ; redundant, value still in register
-        xor     rax, rax
         mov     rdi, card
+        xor     rax, rax
         mov     al, [rdi + rsi]
         mov     [t2], rax
 
@@ -115,7 +112,6 @@ SYS_WRITE equ   0x2000004
 STDOUT  equ     1
 
 printRbx:
-        ; 1 character
         mov     rdx, 1                  ; message length
         mov     rsi, rbx                ; message to write
         mov     rdi, STDOUT             ; file descriptor
@@ -138,7 +134,7 @@ WRITE_CORO:
         ; so it can only return a single read element. The look ahead
         ; reads a second element and thus needs a switch to return the
         ; looked "ahead" element on next call.
-        lea     rbx, [out]
+        mov     rbx, out
         call    printRbx
 
         mov     rax, [i]
@@ -160,10 +156,10 @@ _exitProgram:
 
 _main:
         ; set up coroutine routers
-        lea     rbx, [SQUASHER_CORO]
+        mov     rbx, SQUASHER_CORO
         mov     [route_SQUASHER], rbx
 
-        lea     rbx, [WRITE_CORO]
+        mov     rbx, WRITE_CORO
         mov     [route_WRITE], rbx
 
         ; set up global data

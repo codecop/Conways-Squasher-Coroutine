@@ -4,6 +4,22 @@ According to Donald Knuth, Melvin E. Conway coined the term coroutine in 1958 wh
 
 This is a reimplementation of Conway's code example, the asterisk squasher subroutine, in modern assembly. Read [my analysis of the code](https://blog.code-cop.org/2020/06/conways-squasher-coroutine.html) for more explanations.
 
+## General Setup
+
+* Gnu `make` to run build script
+* [NASM](https://www.nasm.us/) to compile
+* a linker
+* [Smoke](https://github.com/SamirTalwar/smoke) to run tests
+
+### Setup Windows
+
+* `make` from [MinGW](http://www.mingw.org/) or [standalone](https://sourceforge.net/projects/gnuwin32/files/make/)
+* [GoLink](http://www.godevtool.com/GolinkHelp/GoLink.htm)
+
+### Setup Linux
+
+* [Gnu Linker `ld`](https://ftp.gnu.org/old-gnu/Manuals/ld-2.9.1/html_mono/ld.html)
+
 ## License
 
 [BSD License](https://opensource.org/licenses/BSD-3-Clause), see `LICENSE.txt` in repository.

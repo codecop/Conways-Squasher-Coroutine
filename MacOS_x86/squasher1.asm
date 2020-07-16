@@ -16,7 +16,7 @@ card:   resb    card_len                ; module global data for RDCRD and SQUAS
 t1:     resd    1                       ; module global data for SQUASHER
 t2:     resd    1                       ; module global data for SQUASHER
 
-bytesRead: resd 1                       ; module local data for SQUASHER
+numBytes: resd  1                       ; module local data for SQUASHER
 
 out:    resd    1                       ; module global data for SQUASHER, WRITE
 
@@ -31,15 +31,15 @@ RDCRD:
         cmp     eax, card_len
         jne     .exit
 
-        mov     [i], dword 0
+        mov     [i], NULL
 
         ; read card into card[1:80]
 
         push    dword card_len          ; maximum number of bytes to read
         push    dword card              ; buffer to read into
         push    dword STDIN             ; file descriptor
-        mov     eax, SYS_READ
         sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack
+        mov     eax, SYS_READ
         int     0x80
         add     esp, 16
 
@@ -108,12 +108,11 @@ SYS_WRITE equ   4
 STDOUT  equ     1
 
 printEbx:
-        ; 1 character
         push    dword 1                 ; message length
         push    ebx                     ; message to write
         push    dword STDOUT            ; file descriptor
-        mov     eax, SYS_WRITE
         sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack
+        mov     eax, SYS_WRITE
         int     0x80
         add     esp, 16
 
@@ -128,7 +127,7 @@ WRITE:
         ; so it can only return a single read element. The look ahead
         ; reads a second element and thus needs a switch to return the
         ; looked "ahead" element on next call.
-        lea     ebx, [out]
+        mov     ebx, out
         call    printEbx
 
         mov     eax, [i]
@@ -144,7 +143,6 @@ _exitProgram:
         mov     eax, SYS_EXIT
         mov     ebx, 0                  ; return code = 0
         int     0x80
-        hlt                             ; never here
 
 ; --------------------------------------------------------------------------------
         global  _main

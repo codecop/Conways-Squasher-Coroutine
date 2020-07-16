@@ -1,9 +1,4 @@
 bits 32
-        ; external functions in system libraries
-        extern  _ExitProcess@4          ; https://msdn.microsoft.com/en-us/library/windows/desktop/ms682658%28v=vs.85%29.aspx
-        extern  _GetStdHandle@4         ; https://msdn.microsoft.com/en-us/library/windows/desktop/ms683231%28v=vs.85%29.aspx
-        extern  _WriteFile@20           ; https://msdn.microsoft.com/en-us/library/windows/desktop/aa365747%28v=vs.85%29.aspx
-        extern  _ReadFile@20            ; https://msdn.microsoft.com/en-us/library/windows/desktop/aa365467%28v=vs.85%29.aspx
 
 %define NULL    dword 0
 
@@ -21,11 +16,17 @@ card:   resb    card_len                ; module global data for RDCRD and SQUAS
 t1:     resd    1                       ; module global data for SQUASHER
 t2:     resd    1                       ; module global data for SQUASHER
 
-bytesRead: resd 1                       ; module local data for SQUASHER
+numBytes: resd  1                       ; module local data for SQUASHER
 
 out:    resd    1                       ; module global data for SQUASHER, WRITE
 
+; --------------------------------------------------------------------------------
         section .text
+
+        extern  _GetStdHandle@4         ; https://msdn.microsoft.com/en-us/library/windows/desktop/ms683231%28v=vs.85%29.aspx
+        extern  _ReadFile@20            ; https://msdn.microsoft.com/en-us/library/windows/desktop/aa365467%28v=vs.85%29.aspx
+        extern  _WriteFile@20           ; https://msdn.microsoft.com/en-us/library/windows/desktop/aa365747%28v=vs.85%29.aspx
+        extern  _ExitProcess@4          ; https://msdn.microsoft.com/en-us/library/windows/desktop/ms682658%28v=vs.85%29.aspx
 
 ; --------------------------------------------------------------------------------
 STD_INPUT_HANDLE  equ -10
@@ -35,20 +36,20 @@ RDCRD:
         cmp     eax, card_len
         jne     .exit
 
-        mov     [i], dword 0
+        mov     [i], NULL
 
         ; read card into card[1:80]
 
-        ; HANDLE GetStdHandle(_In_ DWORD nStdHandle)
-        push    STD_INPUT_HANDLE
-        call    _GetStdHandle@4         ; eax fileReadHandle = hstdIn
+        ; HANDLE GetStdHandle()
+        push    STD_INPUT_HANDLE        ; _In_ DWORD nStdHandle
+        call    _GetStdHandle@4
 
-        ; BOOL ReadFile(fileHandle, buffer, length, &bytes, 0);
+        ; BOOL ReadFile()
         push    NULL                    ; _Inout_opt_ LPOVERLAPPED lpOverlapped
-        lea     ebx, [bytesRead]
-        push    ebx                     ; _Out_opt_   LPDWORD      bytesRead
+        mov     ebx, numBytes
+        push    ebx                     ; _Out_opt_   LPDWORD      lpNumberOfBytesRead
         push    dword card_len          ; _In_        DWORD        nNumberOfBytesToRead
-        lea     ebx, [card]             ; lpBuffer
+        mov     ebx, card
         push    ebx                     ; _Out_       LPVOID       lpBuffer
         push    eax                     ; _In_        HANDLE       hFile
         call    _ReadFile@20
@@ -117,17 +118,17 @@ SQUASHER:
 STD_OUTPUT_HANDLE equ -11
 
 printEbx:
-        ; `int _getStdOutFileHandle()`
-        push    STD_OUTPUT_HANDLE
+        ; HANDLE GetStdHandle()
+        push    STD_OUTPUT_HANDLE       ; _In_ DWORD nStdHandle
         call    _GetStdHandle@4
 
-        ; 1 character
-        push    NULL            ; LPOVERLAPPED lpOverlapped
-        mov     ecx, bytesRead
-        push    ecx             ; LPDWORD      lpNumberOfBytesWritten,
-        push    dword 1         ; DWORD        nNumberOfBytesToWrite,
-        push    ebx             ; LPCVOID      lpBuffer,
-        push    eax             ; HANDLE       hFile,
+        ; BOOL WriteFile()
+        push    NULL                    ; LPOVERLAPPED lpOverlapped
+        mov     ecx, numBytes
+        push    ecx                     ; LPDWORD      lpNumberOfBytesWritten
+        push    dword 1                 ; DWORD        nNumberOfBytesToWrite
+        push    ebx                     ; LPCVOID      lpBuffer
+        push    eax                     ; HANDLE       hFile
         call    _WriteFile@20
 
         ret
@@ -141,7 +142,7 @@ WRITE:
         ; so it can only return a single read element. The look ahead
         ; reads a second element and thus needs a switch to return the
         ; looked "ahead" element on next call.
-        lea     ebx, [out]
+        mov     ebx, out
         call    printEbx
 
         mov     eax, [i]
@@ -152,9 +153,9 @@ WRITE:
 
 ; --------------------------------------------------------------------------------
 _exitProgram:
-        push    0
+        ; void ExitProcess()
+        push    0                       ; UINT uExitCode
         call    _ExitProcess@4
-        hlt                             ; never here
 
 ; --------------------------------------------------------------------------------
         global  _main

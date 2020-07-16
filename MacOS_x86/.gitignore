@@ -1,2 +1,4 @@
 *.o
-*.exe
+# Ignore executables
+squasher1
+squasher2

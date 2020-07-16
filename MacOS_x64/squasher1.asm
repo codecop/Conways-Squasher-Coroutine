@@ -1,4 +1,5 @@
-bits 32
+bits 64
+default rel
 
 %define NULL    dword 0
 
@@ -27,21 +28,18 @@ SYS_READ equ    3
 STDIN   equ     0
 
 RDCRD:
-        mov     eax, [i]
-        cmp     eax, card_len
+        mov     rax, [i]
+        cmp     rax, card_len
         jne     .exit
 
         mov     [i], dword 0
 
         ; read card into card[1:80]
-
-        push    dword card_len          ; maximum number of bytes to read
-        push    dword card              ; buffer to read into
-        push    dword STDIN             ; file descriptor
-        mov     eax, SYS_READ
-        sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack
-        int     0x80
-        add     esp, 16
+		mov     rdx, card_len           ; maximum number of bytes to read
+		mov     rsi, card               ; buffer to read into
+		mov     rdi, STDIN              ; file descriptor
+        mov     rax, SYS_READ
+        syscall
 
 .exit:
         ret
@@ -52,8 +50,8 @@ SQUASHER:
         cmp     eax, OFF
         je      .off
 .on:
-        mov     eax, [t2]
-        mov     [out], eax
+        mov     rax, [t2]
+        mov     [out], rax
 
         mov     [switch], OFF
         jmp     .exit
@@ -61,31 +59,33 @@ SQUASHER:
 .off:
         call    RDCRD
 
-        mov     esi, [i]
-        xor     eax, eax
-        mov     al, [card + esi]
-        mov     [t1], eax
+        mov     rsi, [i]
+        xor     rax, rax
+        mov     rdi, card
+        mov     al, [rdi + rsi]
+        mov     [t1], rax
 
-        inc     esi
-        mov     [i], esi
+        inc     rsi
+        mov     [i], rsi
 
-        mov     eax, [t1]               ; redundant, value still in register
-        cmp     eax, '*'
+        mov     rax, [t1]               ; redundant, value still in register
+        cmp     rax, '*'
         jne     .not_equal_ast
 
 .equal_ast:
         call    RDCRD
 
-        mov     esi, [i]                ; redundant, value still in register
-        xor     eax, eax
-        mov     al, [card + esi]
-        mov     [t2], eax
+        mov     rsi, [i]                ; redundant, value still in register
+        xor     rax, rax
+        mov     rdi, [card]
+        mov     al, [rdi + rsi]
+        mov     [t2], rax
 
-        inc     esi
-        mov     [i], esi
+        inc     rsi
+        mov     [i], rsi
 
-        mov     eax, [t2]               ; redundant, value still in register
-        cmp     eax, '*'
+        mov     rax, [t2]               ; redundant, value still in register
+        cmp     rax, '*'
         jne     .not_equal_second_ast
 
 .equal_second_ast:
@@ -97,8 +97,8 @@ SQUASHER:
         jmp     .not_equal_ast
 
 .not_equal_ast:                         ; label 1
-        mov     eax, [t1]
-        mov     [out], eax
+        mov     rax, [t1]
+        mov     [out], rax
 
 .exit:
         ret
@@ -107,15 +107,13 @@ SQUASHER:
 SYS_WRITE equ   4
 STDOUT  equ     1
 
-printEbx:
+printRbx:
         ; 1 character
-        push    dword 1                 ; message length
-        push    ebx                     ; message to write
-        push    dword STDOUT            ; file descriptor
-        mov     eax, SYS_WRITE
-        sub     esp, 4                  ; OS X (and BSD) system calls needs "extra space" on stack
-        int     0x80
-        add     esp, 16
+        mov     rdx, 1                  ; message length
+        mov     rsi, rbx                ; message to write
+        mov     rdi, STDOUT             ; file descriptor
+        mov     rax, SYS_WRITE
+        syscall
 
         ret
 
@@ -128,11 +126,11 @@ WRITE:
         ; so it can only return a single read element. The look ahead
         ; reads a second element and thus needs a switch to return the
         ; looked "ahead" element on next call.
-        lea     ebx, [out]
-        call    printEbx
+        lea     rbx, [out]
+        call    printRbx
 
-        mov     eax, [i]
-        cmp     eax, card_len
+        mov     rax, [i]
+        cmp     rax, card_len
         jne     .loop
 
         ret
@@ -141,10 +139,9 @@ WRITE:
 SYS_EXIT equ    1
 
 _exitProgram:
-        mov     eax, SYS_EXIT
-        mov     ebx, 0                  ; return code = 0
-        int     0x80
-        hlt                             ; never here
+        mov     rax, SYS_EXIT
+        mov     rdi, 0                  ; return code = 0
+        syscall
 
 ; --------------------------------------------------------------------------------
         global  _main

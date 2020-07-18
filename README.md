@@ -6,7 +6,7 @@ This is a reimplementation of Conway's code example, the asterisk squasher subro
 
 ## General Setup
 
-* Gnu `make` to run build script
+* GNU `make` to run build script
 * [NASM](https://www.nasm.us/) to compile
 * a linker
 * [Smoke](https://github.com/SamirTalwar/smoke) to run tests
@@ -18,7 +18,7 @@ This is a reimplementation of Conway's code example, the asterisk squasher subro
 
 ### Setup Linux
 
-* [Gnu Linker `ld`](https://ftp.gnu.org/old-gnu/Manuals/ld-2.9.1/html_mono/ld.html)
+* [GNU Linker `ld`](https://ftp.gnu.org/old-gnu/Manuals/ld-2.9.1/html_mono/ld.html)
 
 ## License
 

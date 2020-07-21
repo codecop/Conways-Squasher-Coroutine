@@ -1,0 +1,19 @@
+name: CI macOS
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: macos-10.15
+    steps:
+    - uses: actions/checkout@v2
+    - name: Make and test 32-bit
+      run: |
+        cd MacOS_x86
+        make test
+    - name: Make and test 64-bit
+      run: |
+        cd MacOS_x64
+        make test

@@ -1,0 +1,17 @@
+tests:
+  - name:     "no asterisk"
+    stdin:    "1234567890abcdefghijklmnopqrst1234567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij_"
+    stdout:   "1234567890abcdefghijklmnopqrst1234567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij"
+    exit-status: 0
+  - name:     "one asterisk"
+    stdin:    "*234567890abcdefghijklmnopqrst*234567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghi*________________________________________________________________________________"
+    stdout:   "*234567890abcdefghijklmnopqrst*234567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghi*________________________________________________________________________________"
+    exit-status: 0
+  - name:     "two asterisks"
+    stdin:    "**34567890abcdefghijklmnopqrst**34567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghi**_______________________________________________________________________________"
+    stdout:   "^34567890abcdefghijklmnopqrst^34567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghi^_______________________________________________________________________________"
+    exit-status: 0
+  - name:     "three asterisks"
+    stdin:    "***4567890abcdefghijklmnopqrst***4567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij_"
+    stdout:   "^*4567890abcdefghijklmnopqrst^*4567890ABCDEFGHIJKLMNOPQRST1234567890abcdefghij"
+    exit-status: 0

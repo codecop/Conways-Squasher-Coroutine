@@ -1,0 +1,15 @@
+name: CI linux
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Make and test 64-bit
+      run: |
+        cd Linux_x64
+        make test

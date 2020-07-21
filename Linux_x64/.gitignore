@@ -1,0 +1,5 @@
+*.o
+# Ignore executables
+squasher1
+squasher2
+smoke

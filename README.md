@@ -4,6 +4,8 @@ According to Donald Knuth, Melvin E. Conway coined the term coroutine in 1958 wh
 
 This is a reimplementation of Conway's code example, the asterisk squasher subroutine, in modern assembly. Read [my analysis of the code](https://blog.code-cop.org/2020/06/conways-squasher-coroutine.html) for more explanations.
 
+See also [the follow-up blog post](https://dkandalov.github.io/squasher) by Dmitry with 64-bit assembler and Kotlin.
+
 ## General Setup
 
 * GNU `make` to run build script

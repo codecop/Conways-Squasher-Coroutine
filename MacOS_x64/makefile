@@ -12,4 +12,5 @@ build: ${SRC_EXE}
 
 .PHONY: test
 test: ${SRC_EXE}
-	~/smoke-v2.1.0-Darwin-x86_64 ${SRC_DIR}
+	~/smoke-v2.1.0-Darwin-x86_64 --command ./squasher1 ${SRC_DIR} && \
+	~/smoke-v2.1.0-Darwin-x86_64 --command ./squasher2 ${SRC_DIR}

@@ -7,7 +7,7 @@ $(SRC_DIR)/%.o: $(SRC_DIR)/%.asm
 	nasm -fmacho64 -w+all $< -o $@
 
 $(SRC_DIR)/%: $(SRC_DIR)/%.o
-	ld $< -o $@ -e _main -lSystem -no_pie
+	ld $< -o $@ -e _main -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -lSystem -no_pie
 
 build: ${SRC_EXE}
 
